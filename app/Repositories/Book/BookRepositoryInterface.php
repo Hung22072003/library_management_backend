@@ -6,6 +6,8 @@ use App\Repositories\BaseRepositoryInterface;
 
 interface BookRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getBooksByCategory($id, $size);
+    public function getBooksWithTrashed($size = 10, $q);
+    public function getBooksWithTrashedByCategory($id, $size, $q);
+    public function getBooksByCategory($id, $size, $q);
     public function restore($id);
 }

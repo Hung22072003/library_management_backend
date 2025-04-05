@@ -19,7 +19,7 @@ class User extends Authenticatable implements JWTSubject
     const PASSWORD = 'password';
     const ROLE = 'role';
     const PHONE = 'phone';
-
+    const ROLE_ADMIN = 'ADMIN';
     protected $fillable = [
         self::NAME,
         self::EMAIL,

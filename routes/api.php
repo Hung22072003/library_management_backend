@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,3 +32,9 @@ Route::post('books/{id}', [BookController::class, 'restore']);
 
 //Profile
 Route::get('profile/me', [UserController::class, 'me']);
+
+//Category
+Route::resource('categories', CategoryController::class);
+
+//Author
+Route::resource('authors', AuthorController::class);

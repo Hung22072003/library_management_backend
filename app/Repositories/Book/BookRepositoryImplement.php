@@ -9,26 +9,57 @@ use Illuminate\Support\Facades\DB;
 class BookRepositoryImplement implements BookRepositoryInterface
 {
 
-    private function getAllWithTrashed()
+    private function getAllWithTrashed($q  = '')
     {
-        return Book::withTrashed()->with([
+        return Book::withTrashed()
+        ->where('title', 'like', '%'.$q.'%')
+        ->with([
             'categories' => function ($query) {
                 $query->select('id', 'name');
             },
             'authors' => function ($query) {
                 $query->select('id', 'name', 'biography');
             }
-        ])->select(['id', 'title', 'description', 'publication_year', 'isbn', 'rental_fee', 'available_copies', 'total_copies', 'deleted_at']);
+        ])->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'rental_fee', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
     }
 
-    public function getAll($size = 10)
+    private function getAllNoTrashed($q = '')
     {
-        return $this->getAllWithTrashed()->paginate($size);
+        return Book::with([
+            'categories' => function ($query) {
+                $query->select('id', 'name');
+            },
+            'authors' => function ($query) {
+                $query->select('id', 'name', 'biography');
+            }
+        ])
+        ->where('title', 'like', '%'.$q.'%')->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'rental_fee', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
     }
 
-    public function getBooksByCategory($id, $size = 10)
+    public function getAll($size = 10, $q)
     {
-        return $this->getAllWithTrashed()
+        return $this->getAllNoTrashed($q)->paginate($size);
+    }
+
+
+    public function getBooksWithTrashed($size = 10, $q)
+    {
+
+        return $this->getAllWithTrashed($q)->paginate($size);
+    }
+
+    public function getBooksWithTrashedByCategory($id, $size = 10, $q)
+    {
+        return $this->getAllWithTrashed($q)
+            ->whereHas('categories', function ($query) use ($id) {
+                $query->where('id', $id);
+            })
+            ->paginate($size);
+    }
+
+    public function getBooksByCategory($id, $size = 10, $q)
+    {
+        return $this->getAllNoTrashed($q)
             ->whereHas('categories', function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -74,14 +105,37 @@ class BookRepositoryImplement implements BookRepositoryInterface
             return $book;
         });
     }
-    public function update($id, array $data) {}
+    public function update($id, array $data) {
+        return DB::transaction(function () use ($id, $data) {
+            $book = Book::findOrFail($id);
+            $book->update([
+                Book::TITLE => $data['title'],
+                Book::DESCRIPTION => $data['description'],
+                Book::PUBLICATION_YEAR => $data['publication_year'],
+                Book::ISBN => $data['isbn'],
+                Book::RENTAL_FEE => $data['rental_fee'],
+                Book::TOTAL_COPIES => $data['total_copies'],
+                Book::THUMBNAIL => $data['thumbnail'] ?? $book->thumbnail,
+            ]);
+
+            if (isset($data['categories'])) {
+                $book->categories()->sync($data['categories']);
+            }
+
+            if (isset($data['authors'])) {
+                $book->authors()->sync($data['authors']);
+            }
+            return $book;
+        });
+    }
 
     public function delete($id)
     {
         $book = Book::findOrFail($id);
         $book->delete();
     }
-    public function restore($id) {
+    public function restore($id)
+    {
         $book = Book::withTrashed()->findOrFail($id);
         $book->restore();
     }

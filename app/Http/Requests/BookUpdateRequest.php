@@ -6,7 +6,7 @@ use App\Traits\APIResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BookStoreRequest extends FormRequest
+class BookUpdateRequest extends FormRequest
 {
     use APIResponse;
     /**
@@ -28,9 +28,8 @@ class BookStoreRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'publication_year' => 'required|integer',
-            'isbn' => 'required|string|unique:books,isbn',
+            'isbn' => 'required|string',
             'rental_fee' => 'required|numeric',
-            'available_copies' => 'required|integer',
             'total_copies' => 'required|integer',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'categories' => 'array',

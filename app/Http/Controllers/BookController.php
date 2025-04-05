@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BookStoreRequest;
+use App\Http\Requests\BookUpdateRequest;
 use App\Models\Book;
+use App\Models\User;
 use App\Services\BookService;
 use App\Traits\APIResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Type\Integer;
 
 class BookController extends ControllerWithGuard
@@ -25,14 +29,26 @@ class BookController extends ControllerWithGuard
     public function index()
     {
         $size = request()->query('size', 10);
-        $books = $this->bookService->getAllBooks($size);
+        $q = request()->query('q');
+        $user = Auth::user();
+        if($user->role === User::ROLE_ADMIN) {
+            $books = $this->bookService->getBooksWithTrashed($size, $q);
+            return $this->responseSuccessWithData($books);
+        }
+        $books = $this->bookService->getAllBooks($size, $q);
         return $this->responseSuccessWithData($books);
     }
 
     public function getBooksByCategory($id)
     {
         $size = request()->query('size', 10);
-        $books = $this->bookService->getBooksByCategory($id, $size);
+        $q = request()->query('q');
+        $user = Auth::user();
+        if($user->role === User::ROLE_ADMIN) {
+            $books = $this->bookService->getBooksWithTrashedByCategory($id, $size, $q);
+            return $this->responseSuccessWithData($books);
+        }
+        $books = $this->bookService->getBooksByCategory($id, $size, $q);
         return $this->responseSuccessWithData($books);
     }
 
@@ -62,6 +78,7 @@ class BookController extends ControllerWithGuard
             'categories',
             'authors',
         ]);
+        
         $book = $this->bookService->createBook($data);
         if (!$book) {
             return $this->responseError('Failed to create book', 500);
@@ -92,7 +109,26 @@ class BookController extends ControllerWithGuard
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) {}
+    public function update(BookUpdateRequest $request, string $id) {
+        Gate::authorize('admin');
+        $data = $request->only([
+            'title',
+            'description',
+            'publication_year',
+            'isbn',
+            'rental_fee',
+            'total_copies',
+            'thumbnail',
+            'categories',
+            'authors',
+        ]);
+
+        $book = $this->bookService->updateBook($id, $data);
+        if (!$book) {
+            return $this->responseError('Failed to update book');
+        }
+        return $this->responseSuccess('Updated book successfully');
+    }
 
     /**
      * Remove the specified resource from storage.
