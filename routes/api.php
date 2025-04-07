@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Users
 Route::resource('users', UserController::class);
-
+Route::post('users/import', [UserController::class, 'import']);
 // Books
 Route::resource('books', BookController::class);
 Route::get('books/category/{id}', [BookController::class, 'getBooksByCategory']);

@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('book_loans_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('previous_quantity');
-            $table->integer('after_quantity');
             $table->text('note')->nullable();
             $table->timestamp('returned_at')->nullable();
-            $table->enum('borrowed_status', ['pending', 'borrowed', 'returned', 'overdue'])->default('pending');
+            $table->enum('borrowed_status', ['pending', 'borrowed', 'returned', 'overdue', 'returned (late)', 'cancel'])->default('pending');
             $table->enum('returned_condition', ['good', 'damaged', 'lost'])->nullable();
             $table->decimal('late_fee_per_day', 8, 0)->nullable();
             $table->integer('book_id')->unsigned();

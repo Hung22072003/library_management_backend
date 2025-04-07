@@ -16,8 +16,10 @@ return new class extends Migration
             $table->timestamp('borrowed_at')->nullable();
             $table->timestamp('due_date')->nullable();
             $table->timestamp('return_date')->nullable();
-            $table->enum('status', ['pending', 'borrowed', 'returned', 'overdue'])->default('pending');
-            $table->integer('user_id')->unsigned()->nullable();
+            $table->enum('status', ['pending', 'borrowed', 'returned', 'overdue', 'returned (late)', 'cancel'])->default('pending');
+            $table->timestamp('expired_at')->nullable();
+            $table->timestamp('extended_at')->nullable();
+            $table->string('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();

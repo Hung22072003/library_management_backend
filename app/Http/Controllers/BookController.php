@@ -28,7 +28,7 @@ class BookController extends ControllerWithGuard
      */
     public function index()
     {
-        $size = request()->query('size', 10);
+        $size = request()->query('size', 6);
         $q = request()->query('q');
         $user = Auth::user();
         if($user->role === User::ROLE_ADMIN) {

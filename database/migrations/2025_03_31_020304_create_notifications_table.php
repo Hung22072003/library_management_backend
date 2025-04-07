@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('message');
             $table->boolean('is_read')->default(false);
             $table->string('type')->nullable();
-            $table->integer('user_id')->unsigned()->nullable();
+            $table->string('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();

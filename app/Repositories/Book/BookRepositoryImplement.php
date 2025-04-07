@@ -36,7 +36,7 @@ class BookRepositoryImplement implements BookRepositoryInterface
         ->where('title', 'like', '%'.$q.'%')->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'rental_fee', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
     }
 
-    public function getAll($size = 10, $q)
+    public function getAll($size = 6, $q = '')
     {
         return $this->getAllNoTrashed($q)->paginate($size);
     }

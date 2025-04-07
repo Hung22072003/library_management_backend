@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,13 +16,18 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    const ID = 'id';
     const EMAIL = 'email';
     const NAME = 'name';
     const PASSWORD = 'password';
     const ROLE = 'role';
     const PHONE = 'phone';
     const ROLE_ADMIN = 'ADMIN';
+
+    protected $keyType = 'string';
+    public $incrementing = false;
     protected $fillable = [
+        self::ID,
         self::NAME,
         self::EMAIL,
         self::PASSWORD,
@@ -45,6 +52,10 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'deleted_at' => 'datetime',
     ];
+    // public function serializeDate(\DateTimeInterface $date)
+    // {
+    //     return $date->setTimezone('Asia/Ho_Chi_Minh')->format('Y-m-d H:i:s');
+    // }
 
     public function isAdmin()
     {
@@ -54,6 +65,11 @@ class User extends Authenticatable implements JWTSubject
     public function isUser()
     {
         return $this->role === 'USER';
+    }
+
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
     }
 
     public function notifications(): HasMany
@@ -70,12 +86,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Rating::class);
     }
-    
+
     public function bookLoansBatches(): HasMany
     {
         return $this->hasMany(BookLoansBatch::class);
     }
-    
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);

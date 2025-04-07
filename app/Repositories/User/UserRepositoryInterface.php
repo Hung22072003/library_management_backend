@@ -10,4 +10,5 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
     // public function getDeletedUsers();
     // public function restore($id);
     // public function forceDelete($id);
+    public function getByEmail($email);
 }

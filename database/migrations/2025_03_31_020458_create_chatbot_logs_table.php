@@ -15,7 +15,7 @@ return new class extends Migration
             $table->increments('id');
             $table->text('question');
             $table->text('response');
-            $table->integer('user_id')->unsigned();
+            $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();

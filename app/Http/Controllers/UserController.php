@@ -2,23 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UserService;
 use App\Traits\APIResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends ControllerWithGuard
 {
     use APIResponse;
-    public function __construct()
+    private $userService;
+    public function __construct(UserService $userService)
     {
         parent::__construct();
+        $this->userService = $userService;
     }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        Gate::authorize('admin');
+        
+        $size = request()->query('size', 6);
+        $q = request()->query('q');
+        $users = $this->userService->getAll($size, $q);
+        return $this->responseSuccessWithData($users);
     }
 
     /**
@@ -72,5 +81,19 @@ class UserController extends ControllerWithGuard
     public function me() {
         $user = Auth::user();
         return $this->responseSuccessWithData($user);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $result = $this->userService->importUsersFromExcel($request->file('file'));
+
+        return response()->json([
+            'status' => $result['status'],
+            'message' => $result['message'],
+        ], $result['status']);
     }
 }

@@ -30,6 +30,8 @@ class AuthController extends Controller
         ]);
 
         $credentials = $request->only('email', 'password');
+        $user = $this->userService->getByEmail($request->get('email'));
+        if($user && $user->deleted_at) return $this->responseError('User is deleted', 500);
         // Attempt to log the user in
         if (Auth::attempt($credentials)) {
             $user = Auth::user(); // => get the current authenticated user
@@ -51,7 +53,7 @@ class AuthController extends Controller
 
     public function register(UserRegisterRequest $request)
     {
-        $user = $this->userService->store($request->email, $request->name, $request->phone, $request->password);
+        $user = $this->userService->store($request->id, $request->email, $request->name, $request->phone, $request->password);
         $access_token = JWTAuth::fromUser($user);
         $result = [
             'user' => $user,
