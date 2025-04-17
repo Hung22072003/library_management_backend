@@ -139,4 +139,17 @@ class BookRepositoryImplement implements BookRepositoryInterface
         $book = Book::withTrashed()->findOrFail($id);
         $book->restore();
     }
+    public function decreaseAvailableCopies($id) {
+        $book = Book::findOrFail($id);
+        $book->update([
+            BOOK::AVAILABLE_COPIES => $book->available_copies - 1
+        ]);
+    }
+    
+    public function increaseAvailableCopies($id) {
+        $book = Book::findOrFail($id);
+        $book->update([
+            BOOK::AVAILABLE_COPIES => $book->available_copies + 1
+        ]);
+    }
 }

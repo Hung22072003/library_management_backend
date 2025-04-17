@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('book_loans_batches', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamp('borrowed_at')->nullable();
-            $table->timestamp('due_date')->nullable();
-            $table->timestamp('return_date')->nullable();
+            $table->date('borrowed_at')->nullable();
+            $table->date('due_at')->nullable();
+            $table->date('return_at')->nullable();
             $table->enum('status', ['pending', 'borrowed', 'returned', 'overdue', 'returned (late)', 'cancel'])->default('pending');
-            $table->timestamp('expired_at')->nullable();
-            $table->timestamp('extended_at')->nullable();
+            $table->date('expired_at')->nullable();
+            $table->date('extended_at')->nullable();
             $table->string('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

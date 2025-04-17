@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\BookLoansBatch;
+use App\Repositories\Loan\LoanRepositoryInterface;
+use Illuminate\Support\Facades\Log;
+
+class LoanService
+{
+    private $loanRepository;
+    private $cartService;
+    private $bookService;
+    public function __construct(LoanRepositoryInterface $loanRepository, CartService $cartService, BookService $bookService)
+    {
+        $this->loanRepository = $loanRepository;
+        $this->cartService = $cartService;
+        $this->bookService = $bookService;
+    }
+    public function getAllBatches($size, $q)
+    {
+        return $this->loanRepository->getAll($size, $q);
+    }
+    public function getBatchesOfUser($id, $size = 6)
+    {
+        return $this->loanRepository->getBatchesOfUser($id, $size);
+    }
+    public function getBatchById(int $id)
+    {
+        return $this->loanRepository->getById($id);
+    }
+
+    public function createLoanBatch($data)
+    {
+        $carts = $this->cartService->getCartsOfUser($data['user_id']);
+        if (count($carts) === 0) return [
+            'message' => 'Carts is empty',
+            'status' => 400,
+        ];;
+
+        $data['carts'] = $carts;
+        $loanBatch = $this->loanRepository->create($data);
+        if ($loanBatch) {
+            $this->cartService->clearCarts($data['user_id']);
+            return [
+                'message' => 'Create Loan Batch successfully',
+                'status' => 201,
+            ];
+        }
+
+        return [
+            'message' => 'Failed to create loan batch',
+            'status' => 400,
+        ];
+    }
+
+    public function getExpiredPendingLoans()
+    {
+        return $this->loanRepository->getExpiredPendingLoans();
+    }
+
+    public function getOverdueLoans()
+    {
+        return $this->loanRepository->getOverdueLoans();
+    }
+    public function cancelLoan(BookLoansBatch $loan)
+    {
+        $this->loanRepository->cancelLoanBatch($loan);
+    }
+
+    public function overdueLoan(BookLoansBatch $loan)
+    {
+        $this->loanRepository->overdueLoanBatch($loan);
+    }
+
+    public function extendLoanBatch(BookLoansBatch $loan, $date) {
+        $this->loanRepository->extendLoanBatch($loan, $date);
+    }
+    public function updateStatusBatch($batch, $status)
+    {
+        switch ($status) {
+            case 'cancel': {
+                    $this->loanRepository->cancelLoanBatch($batch);
+                    foreach ($batch->loanDetails as $detail) {
+                        $this->bookService->increaseAvailableCopies($detail->book_id);
+                    }
+                    break;
+                }
+            case 'borrowed': {
+                    $this->loanRepository->borrowLoanBatch($batch);
+                    break;
+                }
+        }
+    }
+
+    public function processMultipleReturns(int $loanBatchId, array $returnDetails)
+    {
+        $batch = $this->getBatchById($loanBatchId);
+        $this->loanRepository->updateReturnDetails($batch, $returnDetails);
+        foreach ($batch->loanDetails as $detail) {
+            $this->bookService->increaseAvailableCopies($detail->book_id);
+        }
+    }
+}

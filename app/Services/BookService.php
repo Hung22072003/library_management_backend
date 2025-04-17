@@ -76,4 +76,12 @@ class BookService
     {
         return $this->bookRepository->restore($id);
     }
+
+    public function decreaseAvailableCopies($id) {
+        return $this->bookRepository->decreaseAvailableCopies($id);
+    }
+
+    public function increaseAvailableCopies($id) {
+        return $this->bookRepository->increaseAvailableCopies($id);
+    }
 }

@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('book_loans_details', function (Blueprint $table) {
             $table->increments('id');
             $table->text('note')->nullable();
-            $table->timestamp('returned_at')->nullable();
+            $table->date('returned_at')->nullable();
             $table->enum('borrowed_status', ['pending', 'borrowed', 'returned', 'overdue', 'returned (late)', 'cancel'])->default('pending');
             $table->enum('returned_condition', ['good', 'damaged', 'lost'])->nullable();
-            $table->decimal('late_fee_per_day', 8, 0)->nullable();
+            $table->decimal('rental_fee', 8, 0)->nullable();
+            $table->decimal('late_fee_per_day', 8, 0)->nullable()->default(5000);
             $table->integer('book_id')->unsigned();
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
             $table->integer('batch_id')->unsigned();

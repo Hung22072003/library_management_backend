@@ -10,4 +10,6 @@ interface BookRepositoryInterface extends BaseRepositoryInterface
     public function getBooksWithTrashedByCategory($id, $size, $q);
     public function getBooksByCategory($id, $size, $q);
     public function restore($id);
+    public function decreaseAvailableCopies($id);
+    public function increaseAvailableCopies($id);
 }
