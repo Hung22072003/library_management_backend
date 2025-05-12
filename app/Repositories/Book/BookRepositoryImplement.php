@@ -3,8 +3,11 @@
 namespace App\Repositories\Book;
 
 use App\Models\Book;
+use App\Models\BookCopy;
+use App\Models\BookCopyConditions;
 use App\Repositories\Book\BookRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BookRepositoryImplement implements BookRepositoryInterface
 {
@@ -12,20 +15,22 @@ class BookRepositoryImplement implements BookRepositoryInterface
     private function getAllWithTrashed($q  = '')
     {
         return Book::withTrashed()
-        ->where('title', 'like', '%'.$q.'%')
-        ->with([
-            'categories' => function ($query) {
-                $query->select('id', 'name');
-            },
-            'authors' => function ($query) {
-                $query->select('id', 'name', 'biography');
-            }
-        ])->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'rental_fee', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
+            ->where('title', 'like', '%' . $q . '%')
+            ->with([
+                'bookcopies',
+                'categories' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'authors' => function ($query) {
+                    $query->select('id', 'name', 'biography');
+                }
+            ])->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
     }
 
     private function getAllNoTrashed($q = '')
     {
         return Book::with([
+            'bookcopies',
             'categories' => function ($query) {
                 $query->select('id', 'name');
             },
@@ -33,7 +38,7 @@ class BookRepositoryImplement implements BookRepositoryInterface
                 $query->select('id', 'name', 'biography');
             }
         ])
-        ->where('title', 'like', '%'.$q.'%')->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'rental_fee', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
+            ->where('title', 'like', '%' . $q . '%')->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
     }
 
     public function getAll($size = 6, $q = '')
@@ -75,15 +80,23 @@ class BookRepositoryImplement implements BookRepositoryInterface
     {
         return DB::transaction(function () use ($data) {
             $book = Book::create([
+                Book::ID => Str::uuid(),
                 Book::TITLE => $data['title'],
                 Book::DESCRIPTION => $data['description'],
                 Book::PUBLICATION_YEAR => $data['publication_year'],
                 Book::ISBN => $data['isbn'],
-                Book::RENTAL_FEE => $data['rental_fee'],
                 Book::AVAILABLE_COPIES => $data['available_copies'],
                 Book::TOTAL_COPIES => $data['total_copies'],
                 Book::THUMBNAIL => $data['thumbnail'] ?? null,
             ]);
+
+            for ($i = 1; $i <= $data['total_copies']; $i++) {
+                BookCopy::create([
+                    BookCopy::ID => Str::uuid(),
+                    BookCopy::ACQUIRED_AT => now(),
+                    BookCopy::BOOK_ID => $book->id
+                ]);
+            }
 
             if (!$book) {
                 return null;
@@ -105,7 +118,8 @@ class BookRepositoryImplement implements BookRepositoryInterface
             return $book;
         });
     }
-    public function update($id, array $data) {
+    public function update($id, array $data)
+    {
         return DB::transaction(function () use ($id, $data) {
             $book = Book::findOrFail($id);
             $book->update([
@@ -113,7 +127,6 @@ class BookRepositoryImplement implements BookRepositoryInterface
                 Book::DESCRIPTION => $data['description'],
                 Book::PUBLICATION_YEAR => $data['publication_year'],
                 Book::ISBN => $data['isbn'],
-                Book::RENTAL_FEE => $data['rental_fee'],
                 Book::TOTAL_COPIES => $data['total_copies'],
                 Book::THUMBNAIL => $data['thumbnail'] ?? $book->thumbnail,
             ]);
@@ -139,17 +152,35 @@ class BookRepositoryImplement implements BookRepositoryInterface
         $book = Book::withTrashed()->findOrFail($id);
         $book->restore();
     }
-    public function decreaseAvailableCopies($id) {
+    public function decreaseAvailableCopies($id)
+    {
         $book = Book::findOrFail($id);
         $book->update([
             BOOK::AVAILABLE_COPIES => $book->available_copies - 1
         ]);
     }
-    
-    public function increaseAvailableCopies($id) {
+
+    public function increaseAvailableCopies($id)
+    {
         $book = Book::findOrFail($id);
         $book->update([
             BOOK::AVAILABLE_COPIES => $book->available_copies + 1
         ]);
+    }
+
+    public function getAllBookCopiesOfOneBook($id) {
+        return BookCopy::where('book_id', '=', $id)->get();
+    }
+
+    
+    public function updateBookCopy($id, $status) {
+        $book = BookCopy::findOrFail($id);
+        $book->update([
+            BookCopy::STATUS => $status
+        ]);
+    }
+
+    public function getConditionOfBookCopy($id) {
+        return BookCopyConditions::where('copy_id', '=', $id)->orderBy('created_at', 'desc')->get();
     }
 }

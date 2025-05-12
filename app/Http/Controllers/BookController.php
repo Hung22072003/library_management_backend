@@ -39,6 +39,9 @@ class BookController extends ControllerWithGuard
         return $this->responseSuccessWithData($books);
     }
 
+    public function getAllBookCopiesOfOneBook($id) {
+        return $this->responseSuccessWithData($this->bookService->getAllBookCopiesOfOneBook($id));
+    }
     public function getBooksByCategory($id)
     {
         $size = request()->query('size', 10);

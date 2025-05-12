@@ -92,7 +92,7 @@ class LoanController extends ControllerWithGuard
         //
     }
 
-    public function updateStatusBatch(Request $request, int $id)
+    public function updateStatusBatch(Request $request, string $id)
     {
         $request->validate([
             "status" => "required|string|in:cancel,borrowed"
@@ -106,7 +106,7 @@ class LoanController extends ControllerWithGuard
         return $this->responseSuccess("Update status batch successfully");
     }
 
-    public function extendLoanBatch(Request $request, int $id)
+    public function extendLoanBatch(Request $request, string $id)
     {
         $request->validate([
             "date" => "required|date_format:Y-m-d"

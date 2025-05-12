@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookLoansBatch extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
     use SoftDeletes;
 
     const BORROWED_AT = 'borrowed_at';
@@ -48,5 +49,9 @@ class BookLoansBatch extends Model
     public function loanDetails()
     {
         return $this->hasMany(BookLoansDetail::class, 'batch_id');
+    }
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'batch_id');
     }
 }

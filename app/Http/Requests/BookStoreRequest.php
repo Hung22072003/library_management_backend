@@ -29,7 +29,6 @@ class BookStoreRequest extends FormRequest
             'description' => 'required|string',
             'publication_year' => 'required|integer',
             'isbn' => 'required|string|unique:books,isbn',
-            'rental_fee' => 'required|numeric',
             'available_copies' => 'required|integer',
             'total_copies' => 'required|integer',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',

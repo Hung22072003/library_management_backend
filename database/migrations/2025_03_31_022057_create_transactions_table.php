@@ -12,17 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
+            $table->text('note')->nullable();
             $table->decimal('amount', 8, 0);
-            $table->enum('type', ['rental_fee', 'late_fee', 'lost_fee', 'damaged_fee', 'other'])->default('rental_fee');   
+            $table->enum('type', ['late_fee', 'lost_fee', 'damaged_fee', 'other'])->nullable();   
             $table->enum('payment_status', ['pending', 'failed', 'success'])->default('pending');
-            $table->enum('payment_method', ['cash', 'momo', 'vnpay'])->default('cash');
-            $table->timestamp('payment_expired_at');
+            $table->enum('payment_method', ['cash', 'momo', 'vnpay'])->nullable();
+            $table->timestamp('payment_expired_at')->nullable();
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('book_id')->unsigned()->nullable();
-            $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
-            $table->integer('batch_id')->unsigned()->nullable();
+            $table->uuid('copy_id')->nullable();
+            $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');
+            $table->uuid('batch_id')->nullable();
             $table->foreign('batch_id')->references('id')->on('book_loans_batches')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();

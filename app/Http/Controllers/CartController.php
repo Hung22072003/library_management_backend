@@ -49,7 +49,7 @@ class CartController extends ControllerWithGuard
     public function store(CartStoreRequest $request)
     {
         $user = Auth::user();
-        $data = $request->only(['book_id', 'rental_fee']);
+        $data = $request->only(['book_id', 'copy_id']);
         $data['user_id'] = $user->id;
         $result = $this->cartService->createCart($data);
         if($result['status'] == 201) {

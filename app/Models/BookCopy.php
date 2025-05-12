@@ -5,20 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Cart extends Model
+class BookCopy extends Model
 {
     use HasFactory, HasUuids;
+    use SoftDeletes;
+
     const ID = 'id';
+    const STATUS = 'status';
+    const CONDITION = 'condition';
+    const ACQUIRED_AT = 'acquired_at';
     const BOOK_ID = 'book_id';
-    const USER_ID = 'user_id';
-    const COPY_ID = 'copy_id';
+
     protected $fillable = [
         self::ID,
+        self::STATUS,
+        self::CONDITION,
+        self::ACQUIRED_AT,
         self::BOOK_ID,
-        self::USER_ID,
-        self::COPY_ID,
     ];
 
     public function book()
@@ -26,13 +31,8 @@ class Cart extends Model
         return $this->belongsTo(Book::class);
     }
 
-    public function bookcopies()
+    public function conditions()
     {
-        return $this->belongsTo(BookCopy::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(BookCopyConditions::class, self::ID);
     }
 }

@@ -12,4 +12,7 @@ interface BookRepositoryInterface extends BaseRepositoryInterface
     public function restore($id);
     public function decreaseAvailableCopies($id);
     public function increaseAvailableCopies($id);
+    public function getAllBookCopiesOfOneBook($id);
+    public function updateBookCopy($id, $status);
+    public function getConditionOfBookCopy($id);
 }

@@ -6,7 +6,7 @@ use App\Traits\APIResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BookReturnRequest extends FormRequest
+class TransactionUpdateRequest extends FormRequest
 {
     use APIResponse;
     /**
@@ -25,12 +25,8 @@ class BookReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'loan_batch_id' => 'required|string|exists:book_loans_batches,id',
-            'returns' => 'required|array',
-            'returns.*.book_id' => 'required|string|exists:book_loans_details,book_id',
-            'returns.*.copy_id' => 'required|string|exists:book_loans_details,copy_id',
-            'returns.*.note' => 'nullable|string',
-            'returns.*.returned_condition' => 'required|in:good,damaged,lost',
+            'payment_status' => 'required|in:pending,failed,success',
+            'payment_method' => 'required|in:cash,momo,vnpay,bank_transfer'
         ];
     }
 

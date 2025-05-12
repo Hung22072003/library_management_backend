@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        Schema::create('book_copy_conditions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->text('message');
-            $table->boolean('is_read')->default(false);
-            $table->string('type')->nullable();
-            $table->string('user_id')->nullable();
+            $table->uuid('copy_id');
+            $table->uuid('user_id');
+            $table->uuid('batch_id');
+            $table->text('condition_note')->nullable();
+            $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('batch_id')->references('id')->on('book_loans_batches')->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('book_copy_conditions');
     }
 };

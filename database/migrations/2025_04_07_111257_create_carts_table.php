@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('carts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->decimal('rental_fee', 8, 0)->nullable();
+            $table->uuid('id')->primary();
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('book_id')->unsigned()->nullable();
+            $table->uuid('book_id')->nullable();
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
+            $table->uuid('copy_id')->nullable();
+            $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');
             $table->timestamps();
         });
     }

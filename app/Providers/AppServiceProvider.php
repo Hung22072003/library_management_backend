@@ -9,6 +9,8 @@ use App\Repositories\Cart\CartRepositoryImplement;
 use App\Repositories\Cart\CartRepositoryInterface;
 use App\Repositories\Loan\LoanRepositoryImplement;
 use App\Repositories\Loan\LoanRepositoryInterface;
+use App\Repositories\Transaction\TransactionRepositoryImplement;
+use App\Repositories\Transaction\TransactionRepositoryInterface;
 use App\Repositories\User\UserRepositoryImplement;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Support\Facades\Gate;
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BookRepositoryInterface::class, BookRepositoryImplement::class);
         $this->app->bind(CartRepositoryInterface::class, CartRepositoryImplement::class);
         $this->app->bind(LoanRepositoryInterface::class, LoanRepositoryImplement::class);
+        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepositoryImplement::class);
     }
 
     /**

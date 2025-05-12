@@ -6,7 +6,7 @@ use App\Traits\APIResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BookReturnRequest extends FormRequest
+class TransactionStoreRequest extends FormRequest
 {
     use APIResponse;
     /**
@@ -25,15 +25,15 @@ class BookReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'loan_batch_id' => 'required|string|exists:book_loans_batches,id',
-            'returns' => 'required|array',
-            'returns.*.book_id' => 'required|string|exists:book_loans_details,book_id',
-            'returns.*.copy_id' => 'required|string|exists:book_loans_details,copy_id',
-            'returns.*.note' => 'nullable|string',
-            'returns.*.returned_condition' => 'required|in:good,damaged,lost',
+            'user_id' => 'required|string|exists:users,id',
+            'batch_id' => 'required|string',
+            'copy_id' => 'required|string|exists:book_copies,id',
+            'amount' => 'required|numeric|min:0',
+            'note' => 'nullable|string',
+            'type' => 'required|in:late_fee,lost_fee,damaged_fee,other'
         ];
     }
-
+    
     public function failedValidation(Validator $validator)
     {
         $errors = $validator->errors()->all();

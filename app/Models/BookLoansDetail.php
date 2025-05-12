@@ -2,26 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BookLoansDetail extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
     protected $fillable = [
         'note',
-        'returned_at',
         'borrowed_status',
         'returned_condition',
-        'rental_fee',
-        'late_fee_per_day',
         'book_id',
+        'copy_id',
         'batch_id',
     ];
 
-    protected $dates = [
-        'returned_at',
-    ];
 
     /**
      * Get the book that is associated with the loan detail.
@@ -29,6 +25,11 @@ class BookLoansDetail extends Model
     public function book()
     {
         return $this->belongsTo(Book::class);
+    }
+
+    public function bookcopies()
+    {
+        return $this->belongsTo(BookCopy::class);
     }
 
     /**

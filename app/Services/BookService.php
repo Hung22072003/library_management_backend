@@ -84,4 +84,16 @@ class BookService
     public function increaseAvailableCopies($id) {
         return $this->bookRepository->increaseAvailableCopies($id);
     }
+
+    public function getAllBookCopiesOfOneBook($id) {
+        return $this->bookRepository->getAllBookCopiesOfOneBook($id);
+    }
+
+    public function updateBookCopy($id, $status) {
+        return $this->bookRepository->updateBookCopy($id, $status);
+    }
+
+    public function getConditionOfBookCopy($id) {
+        return $this->bookRepository->getConditionOfBookCopy($id);
+    }
 }

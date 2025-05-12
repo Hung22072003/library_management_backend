@@ -6,7 +6,7 @@ use App\Models\Book;
 use App\Models\Cart;
 use App\Repositories\Cart\CartRepositoryInterface;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 class CartRepositoryImplement implements CartRepositoryInterface
 {
     public function getAll($size = 6, $q = '') {}
@@ -16,7 +16,12 @@ class CartRepositoryImplement implements CartRepositoryInterface
     }
     public function create(array $data)
     {
-        return Cart::create($data);
+        return Cart::create([
+            Cart::ID => Str::uuid(),
+            Cart::BOOK_ID => $data['book_id'],
+            Cart::COPY_ID => $data['copy_id'],
+            Cart::USER_ID => $data['user_id']
+        ]);
     }
     public function update($id, array $data) {}
     public function delete($id)

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('book_loans_batches', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->date('borrowed_at')->nullable();
             $table->date('due_at')->nullable();
             $table->date('return_at')->nullable();

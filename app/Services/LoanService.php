@@ -25,7 +25,7 @@ class LoanService
     {
         return $this->loanRepository->getBatchesOfUser($id, $size);
     }
-    public function getBatchById(int $id)
+    public function getBatchById(string $id)
     {
         return $this->loanRepository->getById($id);
     }
@@ -42,6 +42,9 @@ class LoanService
         $loanBatch = $this->loanRepository->create($data);
         if ($loanBatch) {
             $this->cartService->clearCarts($data['user_id']);
+            foreach($carts as $cart) {
+                $this->bookService->updateBookCopy($cart->copy_id, "borrowed");
+            }
             return [
                 'message' => 'Create Loan Batch successfully',
                 'status' => 201,
@@ -83,6 +86,7 @@ class LoanService
                     $this->loanRepository->cancelLoanBatch($batch);
                     foreach ($batch->loanDetails as $detail) {
                         $this->bookService->increaseAvailableCopies($detail->book_id);
+                        $this->bookService->updateBookCopy($detail->copy_id, "available");
                     }
                     break;
                 }
@@ -93,7 +97,7 @@ class LoanService
         }
     }
 
-    public function processMultipleReturns(int $loanBatchId, array $returnDetails)
+    public function processMultipleReturns(string $loanBatchId, array $returnDetails)
     {
         $batch = $this->getBatchById($loanBatchId);
         $this->loanRepository->updateReturnDetails($batch, $returnDetails);

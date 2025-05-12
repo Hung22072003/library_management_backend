@@ -29,7 +29,6 @@ class BookUpdateRequest extends FormRequest
             'description' => 'required|string',
             'publication_year' => 'required|integer',
             'isbn' => 'required|string',
-            'rental_fee' => 'required|numeric',
             'total_copies' => 'required|integer',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'categories' => 'array',

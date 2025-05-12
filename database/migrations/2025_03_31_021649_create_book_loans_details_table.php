@@ -12,16 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('book_loans_details', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->text('note')->nullable();
-            $table->date('returned_at')->nullable();
             $table->enum('borrowed_status', ['pending', 'borrowed', 'returned', 'overdue', 'returned (late)', 'cancel'])->default('pending');
             $table->enum('returned_condition', ['good', 'damaged', 'lost'])->nullable();
-            $table->decimal('rental_fee', 8, 0)->nullable();
-            $table->decimal('late_fee_per_day', 8, 0)->nullable()->default(5000);
-            $table->integer('book_id')->unsigned();
+            $table->uuid('book_id');
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
-            $table->integer('batch_id')->unsigned();
+            $table->uuid('copy_id');
+            $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');
+            $table->uuid('batch_id');
             $table->foreign('batch_id')->references('id')->on('book_loans_batches')->onDelete('cascade');
             $table->timestamps();
         });

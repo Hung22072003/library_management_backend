@@ -36,6 +36,7 @@ class CartService
                 'status' => 400
             ];
         }
+
         $cart = $this->existsCart($data['book_id'], $data['user_id']);
         if ($cart) {
             return [
@@ -43,9 +44,12 @@ class CartService
                 'status' => 400
             ];
         }
+        
         $result = $this->cartRepository->create($data);
+
         if ($result) {
             $this->bookService->decreaseAvailableCopies($data['book_id']);
+            $this->bookService->updateBookCopy($data['copy_id'], "in_cart");
             return [
                 'message' => 'Create cart successfully',
                 'status' => 201
@@ -64,6 +68,7 @@ class CartService
         if ($cart && $cart->user_id == $user_id) {
             $this->cartRepository->delete($id);
             $this->bookService->increaseAvailableCopies($cart->book_id);
+            $this->bookService->updateBookCopy($cart->copy_id, "available");
             return  [
                 'message' => 'Delete cart successfully',
                 'status' => 200

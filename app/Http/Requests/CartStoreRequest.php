@@ -26,7 +26,7 @@ class CartStoreRequest extends FormRequest
     {
         return [
             'book_id' => 'required|exists:books,id',
-            'rental_fee' => 'required|numeric|min:0',
+            'copy_id' => 'required|exists:book_copies,id',
         ];
     }
 

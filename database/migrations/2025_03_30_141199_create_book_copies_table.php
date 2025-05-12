@@ -11,21 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('author_book', function (Blueprint $table) {
-            $table->uuid('author_id');
+        Schema::create('book_copies', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->enum('status', ['available', 'in_cart', 'borrowed', 'unavailable'])->default('available');
+            $table->enum('condition', ['new', 'damaged', 'lost'])->default('new');
+            $table->timestamp('acquired_at')->nullable();
             $table->uuid('book_id');
-            $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
-            $table->primary(['author_id', 'book_id']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
-    /**
+    /**t
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('author_book');
+        Schema::dropIfExists('book_copies');
     }
 };
