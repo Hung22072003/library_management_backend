@@ -6,6 +6,8 @@ use App\Http\Controllers\BookCopyController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VnPayController;
@@ -32,6 +34,7 @@ Route::resource('users', UserController::class);
 Route::post('users/import', [UserController::class, 'import']);
 // Books
 Route::resource('books', BookController::class);
+Route::post('books/import', [BookController::class, 'import']);
 Route::get('books/category/{id}', [BookController::class, 'getBooksByCategory']);
 Route::post('books/{id}', [BookController::class, 'restore']);
 Route::get('books/bookcopies/{id}', [BookController::class, 'getAllBookCopiesOfOneBook']);
@@ -57,6 +60,7 @@ Route::resource('carts', CartController::class);
 Route::resource('loans', LoanController::class);
 Route::post('loans/status/{id}', [LoanController::class, 'updateStatusBatch']);
 Route::post('loans/return', [LoanController::class, 'returnMultipleBooks']);
+Route::post('loans/detail/return', [LoanController::class, 'returnOneBook']);
 Route::post('loans/extend/{id}', [LoanController::class, 'extendLoanBatch']);
 
 //Payment
@@ -67,3 +71,15 @@ Route::get('/vnpay-return', [VnPayController::class, 'vnpayReturn'])->name('vnpa
 Route::resource('transactions', TransactionController::class);
 Route::get('transactions/loan/{id}', [TransactionController::class, 'getTransactionsOfLoanBatch']);
 Route::get('transactions/user/{id}', [TransactionController::class, 'getTransactionsOfUser']);
+
+//Notification
+Route::resource('notifications', NotificationController::class);
+
+Route::resource('statistics', StatisticsController::class);
+Route::get('statistics/books/quantity', [StatisticsController::class, 'getTotalQuantityBooks']);
+Route::get('statistics/books/borrowed/most', [StatisticsController::class, 'getTop6MostBorrowedBooks']);
+Route::get('statistics/books/quantity/category', [StatisticsController::class, 'getTotalBooksByCategory']);
+Route::get('statistics/users/borrowed/most', [StatisticsController::class, 'getTop6UsersBorrowMost']);
+Route::get('statistics/books/borrowed/eachday', [StatisticsController::class, 'getBorrowedBooksEachDayLast10Days']);
+Route::get('statistics/books/returned/late', [StatisticsController::class, 'getReturnedVsReturnedLateRatio']);
+Route::get('statistics/transactions/total', [StatisticsController::class, 'getTotalAmountSuccess']);
