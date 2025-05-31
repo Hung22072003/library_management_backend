@@ -37,7 +37,7 @@ class CartRepositoryImplement implements CartRepositoryInterface
 
     public function getCartsOfUser($user_id)
     {
-        return Cart::where('user_id', '=', $user_id)->with('book.authors', 'book.categories')->orderBy('id', 'desc')->get();
+        return Cart::where('user_id', '=', $user_id)->with('book.categories')->orderBy('id', 'desc')->get();
     }
 
     public function clearCarts($user_id)

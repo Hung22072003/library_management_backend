@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Imports\BooksImport;
 use App\Repositories\Book\BookRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BookService
 {
@@ -41,13 +44,29 @@ class BookService
 
     public function createBook(array $data)
     {
-        //upload to aws s3
         if (isset($data['thumbnail'])) {
             $path = $data['thumbnail']->store('images', 's3');
             $url =$this->baseUrl . $path;
             $data['thumbnail'] = $url;
         }
         return $this->bookRepository->create($data);
+    }
+
+    public function importBooksFromExcel($file)
+    {
+        try {
+            Log::info('Book import started', ['file' => $file->getClientOriginalName()]);
+            Excel::import(new BooksImport($this->bookRepository), $file);
+            return [
+                'status' => 200,
+                'message' => 'Books imported successfully!',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 500,
+                'message' => 'Error importing books: ' . $e->getMessage(),
+            ];
+        }
     }
 
     public function updateBook($id, array $data)
@@ -57,10 +76,10 @@ class BookService
             return null;
         }
         //upload to aws s3
-        if (isset($data['thumbnail'])) {
-            $path = $data['thumbnail']->store('images', 's3');
+        if (isset($data['file'])) {
+            $path = $data['file']->store('images', 's3');
             $url = $this->baseUrl. $path;
-            $data['thumbnail'] = $url;
+            $data['file'] = $url;
             if($book->thumbnail) {
                 Storage::disk('s3')->delete(str_replace($this->baseUrl, "", $book->thumbnail));
             }

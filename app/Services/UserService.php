@@ -50,4 +50,7 @@ class UserService
         return $this->userRepository->getByEmail($email);
     }
     
+    public function getById($id) {
+        return $this->userRepository->getById($id);
+    }
 }

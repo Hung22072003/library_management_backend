@@ -11,11 +11,13 @@ class LoanService
     private $loanRepository;
     private $cartService;
     private $bookService;
-    public function __construct(LoanRepositoryInterface $loanRepository, CartService $cartService, BookService $bookService)
+    private $notificationService;
+    public function __construct(LoanRepositoryInterface $loanRepository, CartService $cartService, BookService $bookService, NotificationService $notificationService)
     {
         $this->loanRepository = $loanRepository;
         $this->cartService = $cartService;
         $this->bookService = $bookService;
+        $this->notificationService = $notificationService;
     }
     public function getAllBatches($size, $q)
     {
@@ -42,9 +44,15 @@ class LoanService
         $loanBatch = $this->loanRepository->create($data);
         if ($loanBatch) {
             $this->cartService->clearCarts($data['user_id']);
-            foreach($carts as $cart) {
+            foreach ($carts as $cart) {
                 $this->bookService->updateBookCopy($cart->copy_id, "borrowed");
             }
+
+            $this->notificationService->createNotification([
+                'type' => 'borrow_loan',
+                'batch_id' => $loanBatch->id,
+            ]);
+
             return [
                 'message' => 'Create Loan Batch successfully',
                 'status' => 201,
@@ -66,24 +74,40 @@ class LoanService
     {
         return $this->loanRepository->getOverdueLoans();
     }
+
+    public function getNearlyOverdueLoans()
+    {
+        return $this->loanRepository->getNearlyOverdueLoans();
+    }
     public function cancelLoan(BookLoansBatch $loan)
     {
         $this->loanRepository->cancelLoanBatch($loan);
+        $this->notificationService->createNotification([
+            'type' => 'cancel_loan',
+            'batch_id' => $loan->id,
+            'user_id' => $loan->user_id,
+        ]);
     }
 
     public function overdueLoan(BookLoansBatch $loan)
     {
         $this->loanRepository->overdueLoanBatch($loan);
+        // $this->notificationService->createNotification([
+        //     'type' => 'overdue_loan',
+        //     'batch_id' => $loan->id,
+        //     'user_id' => $loan->user_id,
+        // ]);
     }
 
-    public function extendLoanBatch(BookLoansBatch $loan, $date) {
+    public function extendLoanBatch(BookLoansBatch $loan, $date)
+    {
         $this->loanRepository->extendLoanBatch($loan, $date);
     }
     public function updateStatusBatch($batch, $status)
     {
         switch ($status) {
             case 'cancel': {
-                    $this->loanRepository->cancelLoanBatch($batch);
+                    $this->cancelLoan($batch);
                     foreach ($batch->loanDetails as $detail) {
                         $this->bookService->increaseAvailableCopies($detail->book_id);
                         $this->bookService->updateBookCopy($detail->copy_id, "available");
@@ -101,8 +125,15 @@ class LoanService
     {
         $batch = $this->getBatchById($loanBatchId);
         $this->loanRepository->updateReturnDetails($batch, $returnDetails);
-        foreach ($batch->loanDetails as $detail) {
-            $this->bookService->increaseAvailableCopies($detail->book_id);
+        if (!empty($returnDetails)) {
+            foreach ($returnDetails as $detail) {
+                $this->bookService->increaseAvailableCopies($detail['book_id']);
+            }
         }
+    }
+
+    public function returnOneBook($detail_id, $note, $returnedCondition)
+    {
+        $this->loanRepository->returnOneBook($detail_id, $note, $returnedCondition);
     }
 }

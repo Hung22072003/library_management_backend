@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\NotificationService;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -9,9 +10,11 @@ use Illuminate\Support\Facades\Config;
 class VnPayController extends Controller
 {
     private $transactionService;
-    public function __construct(TransactionService $transactionService)
+    private $notificationService;
+    public function __construct(TransactionService $transactionService, NotificationService $notificationService)
     {
         $this->transactionService = $transactionService;
+        $this->notificationService = $notificationService;
     }
     public function createPayment(Request $request)
     {
@@ -101,6 +104,11 @@ class VnPayController extends Controller
                     'payment_method' => 'vnpay'
                 ]
             );
+
+            $this->notificationService->createNotification([
+                'type' => 'success_payment',
+                'transaction_id' => $id_transaction,
+            ]);
             return redirect(Config::get('services.vnpay.return_url_client') . '?status=success&id=' . $id_transaction);
         }
         $this->transactionService->updateTransaction(

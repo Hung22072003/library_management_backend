@@ -26,7 +26,7 @@ class BookReturnRequest extends FormRequest
     {
         return [
             'loan_batch_id' => 'required|string|exists:book_loans_batches,id',
-            'returns' => 'required|array',
+            'returns' => 'nullable|array',
             'returns.*.book_id' => 'required|string|exists:book_loans_details,book_id',
             'returns.*.copy_id' => 'required|string|exists:book_loans_details,copy_id',
             'returns.*.note' => 'nullable|string',

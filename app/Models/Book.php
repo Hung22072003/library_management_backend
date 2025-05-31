@@ -15,7 +15,11 @@ class Book extends Model
     const TITLE = 'title';
     const DESCRIPTION = 'description';
     const PUBLICATION_YEAR = 'publication_year';
-    const ISBN = 'isbn';
+    const ISBN13 = 'isbn13';
+    const ISBN10 = 'isbn10';
+    const LANGUAGE = 'language';
+    const AUTHORS = 'authors';
+    const NUM_PAGES = 'num_pages';
     const AVAILABLE_COPIES = 'available_copies';
     const TOTAL_COPIES = 'total_copies';
     const THUMBNAIL = 'thumbnail';
@@ -24,7 +28,11 @@ class Book extends Model
         self::TITLE,
         self::DESCRIPTION,
         self::PUBLICATION_YEAR,
-        self::ISBN,
+        self::ISBN13,
+        self::ISBN10,
+        self::LANGUAGE,
+        self::AUTHORS,
+        self::NUM_PAGES,
         self::AVAILABLE_COPIES,
         self::TOTAL_COPIES,
         self::THUMBNAIL,
@@ -34,6 +42,7 @@ class Book extends Model
         self::PUBLICATION_YEAR => 'integer',
         self::AVAILABLE_COPIES => 'integer',
         self::TOTAL_COPIES => 'integer',
+        self::NUM_PAGES => 'integer',
     ];
 
     public function bookcopies()
@@ -44,10 +53,5 @@ class Book extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'book_category', 'book_id', 'category_id');
-    }
-
-    public function authors()
-    {
-        return $this->belongsToMany(Author::class, 'author_book', 'book_id', 'author_id');
     }
 }

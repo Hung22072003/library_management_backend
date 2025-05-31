@@ -26,15 +26,17 @@ class BookUpdateRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'publication_year' => 'required|integer',
-            'isbn' => 'required|string',
-            'total_copies' => 'required|integer',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string',
+            'publication_year' => 'nullable|integer',
+            'isbn13' => 'nullable|string',
+            'isbn10' => 'nullable|string',
+            'language' => 'nullable|string|max:50',
+            'authors' => 'nullable|string|max:255',
+            'num_pages' => 'nullable|integer',
+            'thumbnail' => 'nullable|string',
+            'file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'categories' => 'array',
-            'categories.*' => 'integer|exists:categories,id',
-            'authors' => 'array',
-            'authors.*' => 'integer|exists:authors,id',
+            'categories.*' => 'string|exists:categories,id'
         ];
     }
 

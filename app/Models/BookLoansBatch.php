@@ -51,7 +51,8 @@ class BookLoansBatch extends Model
         return $this->hasMany(BookLoansDetail::class, 'batch_id');
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class, 'batch_id');
     }
 }

@@ -9,6 +9,7 @@ use App\Traits\APIResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class LoanController extends ControllerWithGuard
 {
@@ -35,7 +36,8 @@ class LoanController extends ControllerWithGuard
      */
     public function create()
     {
-        //
+        $batches = $this->loanService->getOverdueLoans();
+        return $this->responseSuccessWithData($batches);
     }
 
     /**
@@ -127,9 +129,27 @@ class LoanController extends ControllerWithGuard
             'returns'
         ]);
 
-        $this->loanService->processMultipleReturns($data['loan_batch_id'], $data['returns']);
+        Log::info($data);
+
+        $this->loanService->processMultipleReturns($data['loan_batch_id'], $data['returns'] ?? []);
 
         return $this->responseSuccess('Return books successfully');
+    }
+
+    public function returnOneBook(Request $request)
+    {
+        Gate::authorize('admin');
+        $request->validate([
+            'detail_id' => 'required|string',
+            'note' => 'required|string',
+            'returned_condition' => 'required|string|in:good,damaged,lost'
+        ]);
+        $this->loanService->returnOneBook(
+            $request->get('detail_id'),
+            $request->get('note'),
+            $request->get('returned_condition')
+        );
+        return $this->responseSuccess("Return book successfully");
     }
 
     public function getBatchesOfUser() {

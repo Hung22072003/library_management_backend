@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('type', ['late_fee', 'lost_fee', 'damaged_fee', 'other'])->nullable();   
             $table->enum('payment_status', ['pending', 'failed', 'success'])->default('pending');
             $table->enum('payment_method', ['cash', 'momo', 'vnpay'])->nullable();
-            $table->timestamp('payment_expired_at')->nullable();
+            $table->date('payment_expired_at')->nullable();
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->uuid('copy_id')->nullable();

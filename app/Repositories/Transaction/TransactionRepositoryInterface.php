@@ -8,4 +8,6 @@ interface TransactionRepositoryInterface extends BaseRepositoryInterface
 {
     public function getTransactionsOfLoanBatch($id);
     public function getTransactionsOfUser($id, $size = 6, $q = '');
+    public function getOverdueTransactions();
+    public function getTotalAmountSuccess();
 }

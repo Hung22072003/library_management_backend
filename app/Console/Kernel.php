@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('loans:update-status')->daily();
+        $schedule->command('works:update-schedule')->daily();
     }
 
     /**

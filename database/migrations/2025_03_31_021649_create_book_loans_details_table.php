@@ -16,6 +16,11 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->enum('borrowed_status', ['pending', 'borrowed', 'returned', 'overdue', 'returned (late)', 'cancel'])->default('pending');
             $table->enum('returned_condition', ['good', 'damaged', 'lost'])->nullable();
+            $table->date('borrowed_at')->nullable();
+            $table->date('due_at')->nullable();
+            $table->date('return_at')->nullable();
+            $table->date('expired_at')->nullable();
+            $table->date('extended_at')->nullable();
             $table->uuid('book_id');
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
             $table->uuid('copy_id');

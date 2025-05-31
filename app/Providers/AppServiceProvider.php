@@ -9,6 +9,8 @@ use App\Repositories\Cart\CartRepositoryImplement;
 use App\Repositories\Cart\CartRepositoryInterface;
 use App\Repositories\Loan\LoanRepositoryImplement;
 use App\Repositories\Loan\LoanRepositoryInterface;
+use App\Repositories\Notification\NotificationRepositoryImplement;
+use App\Repositories\Notification\NotificationRepositoryInterface;
 use App\Repositories\Transaction\TransactionRepositoryImplement;
 use App\Repositories\Transaction\TransactionRepositoryInterface;
 use App\Repositories\User\UserRepositoryImplement;
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CartRepositoryInterface::class, CartRepositoryImplement::class);
         $this->app->bind(LoanRepositoryInterface::class, LoanRepositoryImplement::class);
         $this->app->bind(TransactionRepositoryInterface::class, TransactionRepositoryImplement::class);
+        $this->app->bind(NotificationRepositoryInterface::class, NotificationRepositoryImplement::class);
     }
 
     /**

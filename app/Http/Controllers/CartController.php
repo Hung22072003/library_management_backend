@@ -7,6 +7,7 @@ use App\Services\CartService;
 use App\Traits\APIResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends ControllerWithGuard
 {

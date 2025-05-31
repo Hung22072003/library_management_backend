@@ -7,6 +7,8 @@ use App\Traits\APIResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UserController extends ControllerWithGuard
 {
@@ -43,7 +45,16 @@ class UserController extends ControllerWithGuard
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->only(['email', 'name', 'phone', 'password']);
+        Log::info('User store request', ['data' => $data]);
+        $user = $this->userService->store(
+            Str::uuid(),
+            $data['email'],
+            $data['name'],
+            $data['phone'],
+            $data['password']
+        );
+        return json_encode($user);
     }
 
     /**
@@ -51,7 +62,11 @@ class UserController extends ControllerWithGuard
      */
     public function show(string $id)
     {
-        //
+        $user = $this->userService->getById($id);
+        if (!$user) {
+            return $this->responseError('User not found', 404);
+        }
+        return json_encode($user);
     }
 
     /**

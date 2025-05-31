@@ -36,4 +36,7 @@ class TransactionService
         return $this->transactionRepository->getTransactionsOfLoanBatch($id);
     }
 
+    public function getOverdueTransactions() {
+        return $this->transactionRepository->getOverdueTransactions();
+    }
 }

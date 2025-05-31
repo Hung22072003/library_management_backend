@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationEvent;
 use App\Http\Requests\BookStoreRequest;
 use App\Http\Requests\BookUpdateRequest;
 use App\Models\Book;
@@ -73,13 +74,14 @@ class BookController extends ControllerWithGuard
             'title',
             'description',
             'publication_year',
-            'isbn',
-            'rental_fee',
-            'available_copies',
+            'isbn13',
+            'isbn10',
+            'language',
+            'authors',
+            'num_pages',
             'total_copies',
             'thumbnail',
-            'categories',
-            'authors',
+            'categories'
         ]);
         
         $book = $this->bookService->createBook($data);
@@ -118,12 +120,14 @@ class BookController extends ControllerWithGuard
             'title',
             'description',
             'publication_year',
-            'isbn',
-            'rental_fee',
-            'total_copies',
-            'thumbnail',
-            'categories',
+            'isbn13',
+            'isbn10',
+            'language',
             'authors',
+            'num_pages',
+            'thumbnail',
+            'file',
+            'categories',
         ]);
 
         $book = $this->bookService->updateBook($id, $data);
@@ -148,5 +152,20 @@ class BookController extends ControllerWithGuard
         Gate::authorize('admin');
         $this->bookService->restoreBook($id);
         return $this->responseSuccess('Book restored successfully');
+    }
+
+    public function import(Request $request)
+    {
+        Gate::authorize('admin');
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $result = $this->bookService->importBooksFromExcel($request->file('file'));
+
+        return response()->json([
+            'status' => $result['status'],
+            'message' => $result['message'],
+        ], $result['status']);
     }
 }

@@ -16,6 +16,11 @@ class BookLoansDetail extends Model
         'book_id',
         'copy_id',
         'batch_id',
+        'borrowed_at',
+        'due_at',
+        'return_at',
+        'expired_at',
+        'extended_at',
     ];
 
 

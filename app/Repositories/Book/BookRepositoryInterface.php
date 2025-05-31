@@ -15,4 +15,8 @@ interface BookRepositoryInterface extends BaseRepositoryInterface
     public function getAllBookCopiesOfOneBook($id);
     public function updateBookCopy($id, $status);
     public function getConditionOfBookCopy($id);
+    public function getTotalQuantityBooks();
+    public function getTotalBooksByCategory();
+    public function getTop6MostBorrowedBooks();
+    public function existsBook($isbn13, $isbn10, $title);
 }
