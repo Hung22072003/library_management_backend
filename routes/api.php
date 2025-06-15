@@ -61,6 +61,7 @@ Route::resource('loans', LoanController::class);
 Route::post('loans/status/{id}', [LoanController::class, 'updateStatusBatch']);
 Route::post('loans/return', [LoanController::class, 'returnMultipleBooks']);
 Route::post('loans/detail/return', [LoanController::class, 'returnOneBook']);
+Route::post('loans/detail/{id}/cancel', [LoanController::class, 'cancelOneBook']);
 Route::post('loans/extend/{id}', [LoanController::class, 'extendLoanBatch']);
 
 //Payment

@@ -16,15 +16,20 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function store(String $id, String $email, String $name, String $phone, String $password)
+    public function store(String $id, String $email, String $name, String $phone, String $faculty, String $password)
     {
         return $this->userRepository->create([
             'id' => $id,
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
+            'faculty' => $faculty,
             'hashedPassword' => Hash::make($password),
         ]);
+    }
+
+    public function update($data) {
+        return $this->userRepository->update($data['id'], $data);
     }
     public function importUsersFromExcel($file)
     {

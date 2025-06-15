@@ -4,14 +4,15 @@ namespace App\Repositories\User;
 
 use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class UserRepositoryImplement implements UserRepositoryInterface
 {
 
     public function getAll($size = 6, $q = '') {
         return User::where('name', 'like', '%'.$q.'%')
-                   ->orWhere('email', 'like', '%'.$q.'%')
-                   ->select(['id', 'name','email', 'phone', 'role', 'created_at', 'deleted_at'])
+                   ->orWhere('id', 'like', '%'.$q.'%')
+                   ->select(['id', 'name','email', 'phone', 'faculty', 'role', 'created_at', 'deleted_at'])
                    ->orderBy('created_at', 'desc')
                    ->paginate($size);        
     }
@@ -26,11 +27,22 @@ class UserRepositoryImplement implements UserRepositoryInterface
             'id' => $data['id'],
             'name' => $data['name'],
             'email' => $data['email'],
-            'phone' => '0'.$data['phone'],
+            'phone' => strlen($data['phone']) == 10 ? $data['phone'] : '0'.$data['phone'],
+            'faculty' => $data['faculty'],
             'password' => $data['hashedPassword'],
         ]);
     }
-    public function update($id, array $data) {}
+    public function update($id, array $data) {
+        return DB::transaction(function () use ($id, $data){
+            $user = User::findOrFail($id);
+            $user->update([
+                USER::NAME => $data[USER::NAME],
+                USER::PHONE => $data[USER::PHONE],
+                USER::FACULTY => $data[USER::FACULTY]
+            ]);
+            return $user;
+        });
+    }
 
     public function delete($id) {}
 

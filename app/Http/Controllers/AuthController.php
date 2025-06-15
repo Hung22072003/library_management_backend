@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegisterRequest;
+use App\Services\AuthService;
 use App\Services\UserService;
 use App\Traits\APIResponse;
 use Illuminate\Http\Request;
@@ -14,9 +15,11 @@ class AuthController extends Controller
 {
     use APIResponse;
     private $userService;
-    public function __construct(UserService $userService)
+    private $authService;
+    public function __construct(UserService $userService, AuthService $authService)
     {
         $this->userService = $userService;
+        $this->authService = $authService;
     }
     /**
      * Handle user registration.
@@ -61,5 +64,29 @@ class AuthController extends Controller
         ];
 
         return $this->responseSuccessWithData($result, true);
+    }
+
+     public function requestOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        return $this->authService->sendOtp($request->email);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|string'
+        ]);
+        return $this->authService->verifyOtp($request->email, $request->otp);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:6'
+        ]);
+        return $this->authService->resetPassword($request->all());
     }
 }

@@ -19,3 +19,6 @@ Route::get('/', function () {
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/forgot-password/request', [AuthController::class, 'requestOtp']);
+Route::post('/forgot-password/verify', [AuthController::class, 'verifyOtp']);
+Route::post('/forgot-password/reset', [AuthController::class, 'resetPassword']);
