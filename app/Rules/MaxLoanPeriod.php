@@ -31,9 +31,9 @@ class MaxLoanPeriod implements ValidationRule
         // Tính số ngày giữa borrowed_at và due_date
         $daysDifference = $borrowedAt->diffInDays($dueDate);
 
-        // Kiểm tra nếu số ngày vượt quá 14
-        if ($daysDifference > 14) {
-            $fail('Book loan period cannot exceed 14 days.');
+        // Kiểm tra nếu số ngày vượt quá 30
+        if ($daysDifference > 30) {
+            $fail('Book loan period cannot exceed 30 days.');
         }
     }
 }

@@ -7,6 +7,7 @@ use App\Models\BookCopy;
 use App\Models\BookCopyConditions;
 use App\Repositories\Book\BookRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BookRepositoryImplement implements BookRepositoryInterface
@@ -34,7 +35,7 @@ class BookRepositoryImplement implements BookRepositoryInterface
                 'categories' => function ($query) {
                     $query->select('id', 'name');
                 }
-            ])->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn13', 'isbn10', 'language', 'authors', 'num_pages', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
+            ])->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn13', 'isbn10', 'language', 'authors', 'num_pages', 'available_copies', 'total_copies', 'thumbnail', 'floor', 'shelf', 'row', 'col', 'deleted_at']);
     }
 
     private function getAllNoTrashed($q = '')
@@ -44,7 +45,7 @@ class BookRepositoryImplement implements BookRepositoryInterface
             'categories' => function ($query) {
                 $query->select('id', 'name');
             }
-        ])->where('title', 'like', '%' . $q . '%')->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn13', 'isbn10', 'language', 'authors', 'num_pages', 'available_copies', 'total_copies', 'thumbnail', 'deleted_at']);
+        ])->where('title', 'like', '%' . $q . '%')->orderBy('id', 'desc')->select(['id', 'title', 'description', 'publication_year', 'isbn13', 'isbn10', 'language', 'authors', 'num_pages', 'available_copies', 'total_copies', 'thumbnail', 'floor', 'shelf', 'row', 'col', 'deleted_at']);
     }
 
     public function getAll($size = 6, $q = '')
@@ -81,35 +82,51 @@ class BookRepositoryImplement implements BookRepositoryInterface
     {
         return $this->getAllWithTrashed()->find($id);
     }
+    function generateUniqueBookId(): string
+    {
+        do {
+            $id = 'DUT' . str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        } while (Book::where(Book::ID, $id)->exists());
 
-    public function create(array $data)
+        return $id;
+    }
+     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
+            $nextNumber = $this->getNextBookNumber();
+            $bookId = 'DUT' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+
+            $categoryId = $data['categories'][0] ?? '000';
+            $existingCount = Book::withTrashed()->with('categories')->whereHas('categories', function ($query) use ($categoryId) {
+                $query->where('id', $categoryId);
+            })->count();
+            $location = $this->getBookLocation($existingCount, $categoryId);
+
             $book = Book::create([
-                Book::ID => Str::uuid(),
-                Book::TITLE => $data['title'],
-                Book::DESCRIPTION => $data['description'] ?? null,
-                Book::PUBLICATION_YEAR => $data['publication_year'] ?? null,
-                Book::ISBN13 => $data['isbn13'] ?? null,
-                Book::ISBN10 => $data['isbn10'] ?? null,
-                Book::LANGUAGE => $data['language'] ?? null,
-                Book::AUTHORS => $data['authors'] ?? null,
-                Book::NUM_PAGES => $data['num_pages'] ?? null,
-                Book::AVAILABLE_COPIES => $data['total_copies'] ?? null,
-                Book::TOTAL_COPIES => $data['total_copies'] ?? null,
-                Book::THUMBNAIL => $data['thumbnail'] ?? null,
+                'id' => $bookId,
+                'title' => $data['title'],
+                'description' => $data['description'] ?? null,
+                'publication_year' => $data['publication_year'] ?? null,
+                'isbn13' => $data['isbn13'] ?? null,
+                'isbn10' => $data['isbn10'] ?? null,
+                'language' => $data['language'] ?? null,
+                'authors' => $data['authors'] ?? null,
+                'num_pages' => $data['num_pages'] ?? null,
+                'available_copies' => $data['total_copies'] ?? 0,
+                'total_copies' => $data['total_copies'] ?? 0,
+                'thumbnail' => $data['thumbnail'] ?? null,
+                'floor' => $location['floor'],
+                'shelf' => $location['shelf'],
+                'row' => $location['row'],
+                'col' => $location['col'],
             ]);
 
-            for ($i = 1; $i <= $data['total_copies']; $i++) {
+            for ($i = 1; $i <= ($data['total_copies'] ?? 0); $i++) {
                 BookCopy::create([
-                    BookCopy::ID => Str::uuid(),
-                    BookCopy::ACQUIRED_AT => now(),
-                    BookCopy::BOOK_ID => $book->id
+                    'id' => $bookId . '-' . $i,
+                    'acquired_at' => now(),
+                    'book_id' => $bookId,
                 ]);
-            }
-
-            if (!$book) {
-                return null;
             }
 
             if (isset($data['categories'])) {
@@ -118,8 +135,38 @@ class BookRepositoryImplement implements BookRepositoryInterface
                     'updated_at' => now(),
                 ]);
             }
+
             return $book;
         });
+    }
+
+    private function getNextBookNumber(): int
+    {
+        $latestBook = Book::orderByDesc('id')->first();
+
+        if ($latestBook && preg_match('/^DUT(\d{6})$/', $latestBook->id, $matches)) {
+            return (int)$matches[1] + 1;
+        }
+
+        return 1;
+    }
+
+    private function getBookLocation(int $indexInCategory, int $categoryId): array
+    {
+        // Mỗi shelf chứa tối đa 100 sách (10 row x 10 col)
+        $shelfIndex = intdiv($indexInCategory, 100); // 0 = A, 1 = B, 2 = C, ...
+        $shelfLetter = chr(ord('A') + $shelfIndex);
+
+        $positionInShelf = $indexInCategory % 100;
+        $row = intdiv($positionInShelf, 10) + 1;
+        $col = ($positionInShelf % 10) + 1;
+
+        return [
+            'floor' => '2',
+            'shelf' => $shelfLetter . str_pad($categoryId, 3, '0', STR_PAD_LEFT),
+            'row' => (string) $row,
+            'col' => (string) $col,
+        ];
     }
     public function update($id, array $data)
     {

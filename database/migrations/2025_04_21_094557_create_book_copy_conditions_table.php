@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('book_copy_conditions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('copy_id');
-            $table->uuid('user_id');
+            $table->string('copy_id');
+            $table->string('user_id');
             $table->uuid('batch_id');
             $table->text('condition_note')->nullable();
             $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');

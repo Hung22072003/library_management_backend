@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chatbot_logs', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->text('question');
-            $table->text('response');
-            $table->string('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        Schema::create('otp_codes', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email')->index();
+            $table->string('otp');
+            $table->timestamp('expired_at');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chatbot_logs');
+        Schema::dropIfExists('otp_codes');
     }
 };

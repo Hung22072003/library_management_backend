@@ -123,7 +123,7 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
     public function borrowLoanBatch(BookLoansBatch $loan)
     {
         $loan->update(['status' => 'borrowed']);
-        $loan->loanDetails()->update(['borrowed_status' => 'borrowed']);
+        $loan->loanDetails()->where('borrowed_status', 'pending')->update(['borrowed_status' => 'borrowed']);
     }
 
     public function extendLoanBatch(BookLoansBatch $loan, $date)
@@ -154,9 +154,11 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
                         'return_at' => $now,
                     ]);
 
-                $updateData = [
-                    BookCopy::STATUS => $detail['returned_condition'] == 'lost' ? 'unavailable' : 'available',
-                ];
+                $updateData = [];
+                if ($detail['returned_condition'] == 'lost') {
+                    $updateData[BookCopy::STATUS] = 'unavailable';
+                    Book::where('id', $detail['book_id'])->decrement('available_copies');
+                }
 
                 if ($detail['returned_condition'] != 'good') {
                     $updateData[BookCopy::CONDITION] = $detail['returned_condition'];
@@ -209,9 +211,12 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
             'return_at' => $now,
         ]);
 
-        $updateData = [
-            BookCopy::STATUS => $returnedCondition == 'lost' ? 'unavailable' : 'available',
-        ];
+        $updateData = [];
+        if ($returnedCondition == 'lost') {
+            $updateData[BookCopy::STATUS] = 'unavailable';
+            Book::where('id', $detail->book_id)->decrement('available_copies');
+        }
+
 
         if ($returnedCondition != 'good') {
             $updateData[BookCopy::CONDITION] = $returnedCondition;
@@ -224,6 +229,30 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
         }
         BookCopy::where('id', $detail->copy_id)->update($updateData);
         Book::where('id', $detail->book_id)->increment('available_copies');
+    }
+
+    public function cancelOneBook($id)
+    {
+        $detail = BookLoansDetail::findOrFail($id)->load('batch');
+        $detail->update([
+            'borrowed_status' => 'cancel'
+        ]);
+
+        if($this->checkAllBatchDetailCanceled($detail->batch->id))
+        {
+            $detail->batch->update([
+                'status' => 'cancel'
+            ]);
+        }
+        Book::where('id', $detail->book_id)->increment('available_copies');
+    }
+
+    public function checkAllBatchDetailCanceled($id)
+    {
+        $batch = $this->getById($id);
+
+        $details = BookLoansDetail::where('batch_id', $id)->where('borrowed_status', 'cancel')->get(); 
+        return count($details->toArray()) === count($batch->loanDetails);
     }
 
     public function getTop6UsersBorrowMost()

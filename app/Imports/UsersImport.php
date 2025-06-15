@@ -7,6 +7,7 @@ use App\Repositories\UserRepository;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 
 class UsersImport implements ToModel, WithHeadingRow, WithChunkReading
@@ -23,17 +24,22 @@ class UsersImport implements ToModel, WithHeadingRow, WithChunkReading
     }
     public function model(array $row)
     {
+        Log::info($row['id']);
         // Kiểm tra nếu ID đã tồn tại thì bỏ qua
         if ($this->userRepository->getById($row['id'])) {
             return null;
         }
 
-        return $this->userRepository->create([
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'phone' => $row['phone'],
-            'email' => $row['id'] . '@sv1.dut.udn.vn',
-            'hashedPassword' => Hash::make($row['id']),
-        ]);
+        if ($row['id']) {
+            return $this->userRepository->create([
+                'id' => $row['id'],
+                'name' => $row['name'],
+                'phone' => $row['phone'],
+                'email' => $row['id'] . '@sv1.dut.udn.vn',
+                'faculty' => $row['faculty'],
+                'hashedPassword' => Hash::make($row['id']),
+            ]);
+        }
+        return null;
     }
 }

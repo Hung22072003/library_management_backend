@@ -9,14 +9,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
     use SoftDeletes;
     const ID = 'id';
     const NAME = 'name';
     protected $fillable = [
+        self::ID,
         self::NAME,
     ];
     protected $casts = [
+        self::ID => 'string',
         self::NAME => 'string',
     ];
     // many to many relationship with books

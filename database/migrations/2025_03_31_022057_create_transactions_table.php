@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('payment_expired_at')->nullable();
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->uuid('copy_id')->nullable();
+            $table->string('copy_id')->nullable();
             $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');
             $table->uuid('batch_id')->nullable();
             $table->foreign('batch_id')->references('id')->on('book_loans_batches')->onDelete('cascade');

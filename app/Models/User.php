@@ -22,6 +22,7 @@ class User extends Authenticatable implements JWTSubject
     const PASSWORD = 'password';
     const ROLE = 'role';
     const PHONE = 'phone';
+    const FACULTY = 'faculty';
     const ROLE_ADMIN = 'ADMIN';
 
     protected $keyType = 'string';
@@ -33,6 +34,7 @@ class User extends Authenticatable implements JWTSubject
         self::PASSWORD,
         self::ROLE,
         self::PHONE,
+        self::FACULTY
     ];
 
     /**

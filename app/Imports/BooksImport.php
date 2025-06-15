@@ -41,6 +41,7 @@ class BooksImport implements ToModel, WithHeadingRow, WithChunkReading
         if (!empty($row['categories'])) {
             $categories = array_map('trim', explode(',', $row['categories']));
         }
+        if (! $row['title']) return null;
         return $this->bookRepository->create([
             'title' => $row['title'],
             'authors' => $row['authors'],

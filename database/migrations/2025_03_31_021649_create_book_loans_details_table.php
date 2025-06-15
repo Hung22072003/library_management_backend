@@ -21,9 +21,9 @@ return new class extends Migration
             $table->date('return_at')->nullable();
             $table->date('expired_at')->nullable();
             $table->date('extended_at')->nullable();
-            $table->uuid('book_id');
+            $table->string('book_id');
             $table->foreign('book_id')->references('id')->on('books')->onDelete('cascade');
-            $table->uuid('copy_id');
+            $table->string('copy_id');
             $table->foreign('copy_id')->references('id')->on('book_copies')->onDelete('cascade');
             $table->uuid('batch_id');
             $table->foreign('batch_id')->references('id')->on('book_loans_batches')->onDelete('cascade');

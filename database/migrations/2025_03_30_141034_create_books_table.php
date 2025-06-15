@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('books', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->string('id')->primary();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->integer('publication_year')->nullable();
@@ -24,6 +24,10 @@ return new class extends Migration
             $table->string('language')->nullable();
             $table->string('authors')->nullable();
             $table->integer('num_pages')->nullable();
+            $table->string('floor')->nullable();
+            $table->string('shelf')->nullable();
+            $table->string('row')->nullable();
+            $table->string('col')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

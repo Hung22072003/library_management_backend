@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserStoreRequest;
 use App\Services\UserService;
 use App\Traits\APIResponse;
 use Illuminate\Http\Request;
@@ -43,18 +44,19 @@ class UserController extends ControllerWithGuard
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
-        $data = $request->only(['email', 'name', 'phone', 'password']);
-        Log::info('User store request', ['data' => $data]);
+        Gate::authorize('admin');
+        $data = $request->only(['id', 'email', 'name', 'phone', 'faculty']);
         $user = $this->userService->store(
-            Str::uuid(),
+            $data['id'],
             $data['email'],
             $data['name'],
             $data['phone'],
-            $data['password']
+            $data['faculty'],
+            $data['id']
         );
-        return json_encode($user);
+        return $this->responseSuccessWithData($user, 201);
     }
 
     /**
@@ -82,7 +84,11 @@ class UserController extends ControllerWithGuard
      */
     public function update(Request $request, string $id)
     {
-        //
+        Gate::authorize('admin');
+        $data = $request->only(['name', 'phone', 'faculty']);
+        $data['id'] = $id;
+        $user = $this->userService->update($data);
+        return $this->responseSuccessWithData($user, 201);
     }
 
     /**

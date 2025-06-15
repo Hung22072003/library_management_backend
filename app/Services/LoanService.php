@@ -136,4 +136,9 @@ class LoanService
     {
         $this->loanRepository->returnOneBook($detail_id, $note, $returnedCondition);
     }
+
+    public function cancelOneBook($id)
+    {
+        $this->loanRepository->cancelOneBook($id);
+    }
 }

@@ -22,9 +22,9 @@ class CartService
     public function createCart($data)
     {
         $existCarts = $this->getCartsOfUser($data['user_id']);
-        if(count($existCarts) === 3) {
+        if(count($existCarts) === 12) {
             return [
-                'message' => 'Maximum 3 books in cart',
+                'message' => 'Maximum 12 books in cart',
                 'status' => 400
             ];
         }

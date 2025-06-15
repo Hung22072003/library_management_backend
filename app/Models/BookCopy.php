@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookCopy extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
     use SoftDeletes;
-
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
     const ID = 'id';
     const STATUS = 'status';
     const CONDITION = 'condition';

@@ -152,6 +152,12 @@ class LoanController extends ControllerWithGuard
         return $this->responseSuccess("Return book successfully");
     }
 
+    public function cancelOneBook(string $id)
+    {
+        Gate::authorize('admin');
+        $this->loanService->cancelOneBook($id);
+        return $this->responseSuccess("Cancel book successfully");
+    }
     public function getBatchesOfUser() {
         $user = Auth::user();
         $size = request()->query('size', 6);

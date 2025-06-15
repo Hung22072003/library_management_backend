@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('book_copies', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->string('id')->primary();
             $table->enum('status', ['available', 'in_cart', 'borrowed', 'unavailable'])->default('available');
             $table->enum('condition', ['new', 'damaged', 'lost'])->default('new');
             $table->timestamp('acquired_at')->nullable();

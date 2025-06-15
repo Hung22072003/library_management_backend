@@ -9,8 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Book extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
     use SoftDeletes;
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
     const ID = 'id';
     const TITLE = 'title';
     const DESCRIPTION = 'description';
@@ -23,8 +26,13 @@ class Book extends Model
     const AVAILABLE_COPIES = 'available_copies';
     const TOTAL_COPIES = 'total_copies';
     const THUMBNAIL = 'thumbnail';
+    const FLOOR = 'floor';
+    const SHELF = 'shelf';
+    const ROW = 'row';
+    const COL = 'col';
 
     protected $fillable = [
+        self::ID,
         self::TITLE,
         self::DESCRIPTION,
         self::PUBLICATION_YEAR,
@@ -36,6 +44,10 @@ class Book extends Model
         self::AVAILABLE_COPIES,
         self::TOTAL_COPIES,
         self::THUMBNAIL,
+        self::FLOOR,
+        self::SHELF,
+        self::ROW,
+        self::COL,
     ];
 
     protected $casts = [

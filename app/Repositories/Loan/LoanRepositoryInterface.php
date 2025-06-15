@@ -17,6 +17,7 @@ interface LoanRepositoryInterface extends BaseRepositoryInterface {
     public function extendLoanBatch(BookLoansBatch $loan, $date);
     public function updateReturnDetails(BookLoansBatch $batch, array $returnDetails);
     public function returnOneBook($detail_id, $note, $returnedCondition);
+    public function cancelOneBook($id);
     public function getTop6UsersBorrowMost();
     public function getBorrowedBooksEachDayLast10Days();
     public function getReturnedVsReturnedLateRatio();
