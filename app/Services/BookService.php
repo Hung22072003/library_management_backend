@@ -115,4 +115,8 @@ class BookService
     public function getConditionOfBookCopy($id) {
         return $this->bookRepository->getConditionOfBookCopy($id);
     }
+
+    public function addBookCopies($id, $num) {
+        $this->bookRepository->addBookCopies($id, $num);
+    }
 }

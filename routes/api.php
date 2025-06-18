@@ -38,6 +38,7 @@ Route::post('books/import', [BookController::class, 'import']);
 Route::get('books/category/{id}', [BookController::class, 'getBooksByCategory']);
 Route::post('books/{id}', [BookController::class, 'restore']);
 Route::get('books/bookcopies/{id}', [BookController::class, 'getAllBookCopiesOfOneBook']);
+Route::post('books/{id}/bookcopies/add', [BookController::class, 'addBookCopies']);
 
 //Book Copy
 Route::resource('bookcopies', BookCopyController::class);
@@ -49,9 +50,6 @@ Route::get('profile/batches', [LoanController::class, 'getBatchesOfUser']);
 
 //Category
 Route::resource('categories', CategoryController::class);
-
-//Author
-Route::resource('authors', AuthorController::class);
 
 //Cart
 Route::resource('carts', CartController::class);

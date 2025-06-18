@@ -56,7 +56,7 @@ class AuthController extends Controller
 
     public function register(UserRegisterRequest $request)
     {
-        $user = $this->userService->store($request->id, $request->email, $request->name, $request->phone, $request->password);
+        $user = $this->userService->store($request->id, $request->email, $request->name, $request->phone, $request->password, $request->password);
         $access_token = JWTAuth::fromUser($user);
         $result = [
             'user' => $user,

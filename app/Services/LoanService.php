@@ -82,11 +82,11 @@ class LoanService
     public function cancelLoan(BookLoansBatch $loan)
     {
         $this->loanRepository->cancelLoanBatch($loan);
-        $this->notificationService->createNotification([
-            'type' => 'cancel_loan',
-            'batch_id' => $loan->id,
-            'user_id' => $loan->user_id,
-        ]);
+        // $this->notificationService->createNotification([
+        //     'type' => 'cancel_loan',
+        //     'batch_id' => $loan->id,
+        //     'user_id' => $loan->user_id,
+        // ]);
     }
 
     public function overdueLoan(BookLoansBatch $loan)

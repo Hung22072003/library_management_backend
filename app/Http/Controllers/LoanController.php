@@ -154,7 +154,6 @@ class LoanController extends ControllerWithGuard
 
     public function cancelOneBook(string $id)
     {
-        Gate::authorize('admin');
         $this->loanService->cancelOneBook($id);
         return $this->responseSuccess("Cancel book successfully");
     }

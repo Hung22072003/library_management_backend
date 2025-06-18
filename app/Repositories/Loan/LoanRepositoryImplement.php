@@ -154,7 +154,9 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
                         'return_at' => $now,
                     ]);
 
-                $updateData = [];
+                $updateData = [
+                    BookCopy::STATUS => 'available'
+                ];
                 if ($detail['returned_condition'] == 'lost') {
                     $updateData[BookCopy::STATUS] = 'unavailable';
                     Book::where('id', $detail['book_id'])->decrement('available_copies');
@@ -169,7 +171,7 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
                         BookCopyConditions::CONDITION_NOTE => $detail['note'],
                     ]);
                 }
-
+                Book::where('id', $detail['book_id'])->increment('available_copies');
                 BookCopy::where('id', $detail['copy_id'])->update($updateData);
             }
         }
@@ -211,7 +213,9 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
             'return_at' => $now,
         ]);
 
-        $updateData = [];
+        $updateData = [
+            BookCopy::STATUS => 'available'
+        ];
         if ($returnedCondition == 'lost') {
             $updateData[BookCopy::STATUS] = 'unavailable';
             Book::where('id', $detail->book_id)->decrement('available_copies');
@@ -238,20 +242,22 @@ class LoanRepositoryImplement implements LoanRepositoryInterface
             'borrowed_status' => 'cancel'
         ]);
 
-        if($this->checkAllBatchDetailCanceled($detail->batch->id))
-        {
+        if ($this->checkAllBatchDetailCanceled($detail->batch->id)) {
             $detail->batch->update([
                 'status' => 'cancel'
             ]);
         }
         Book::where('id', $detail->book_id)->increment('available_copies');
+        BookCopy::where('id', $detail->copy_id)->update([
+            BookCopy::STATUS => 'available'
+        ]);
     }
 
     public function checkAllBatchDetailCanceled($id)
     {
         $batch = $this->getById($id);
 
-        $details = BookLoansDetail::where('batch_id', $id)->where('borrowed_status', 'cancel')->get(); 
+        $details = BookLoansDetail::where('batch_id', $id)->where('borrowed_status', 'cancel')->get();
         return count($details->toArray()) === count($batch->loanDetails);
     }
 

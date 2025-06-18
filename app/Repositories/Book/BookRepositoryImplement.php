@@ -263,4 +263,22 @@ class BookRepositoryImplement implements BookRepositoryInterface
             ->limit(6)
             ->get();
     }
+
+    
+    public function addBookCopies($id, $num) {
+        $book = Book::findOrFail($id);
+        $quantity = $book->total_copies;
+        $book->update([
+            BOOK::TOTAL_COPIES => $book->total_copies + $num,
+            BOOK::AVAILABLE_COPIES => $book->available_copies + $num,
+        ]);
+
+        for ($i = 1; $i <= $num; $i++) {
+            BookCopy::create([
+                'id' => $book->id . '-' . ($quantity + $i),
+                'acquired_at' => now(),
+                'book_id' => $book->id,
+            ]);
+        }
+    }
 }

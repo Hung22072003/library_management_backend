@@ -12,6 +12,7 @@ use App\Traits\APIResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Type\Integer;
 
@@ -167,5 +168,13 @@ class BookController extends ControllerWithGuard
             'status' => $result['status'],
             'message' => $result['message'],
         ], $result['status']);
+    }
+
+    public function addBookCopies($id, Request $request) {
+        $request->validate([
+            'num' => 'required|integer',
+        ]);
+        $this->bookService->addBookCopies($id, $request->get('num'));
+        return $this->responseSuccess();
     }
 }
